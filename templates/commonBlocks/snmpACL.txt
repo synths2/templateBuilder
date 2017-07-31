@@ -1,0 +1,14 @@
+{# MUST include a trailing new line at the end of the file #}
+access-list 98 permit 10.3.1.26
+access-list 98 permit 10.2.1.26
+access-list 98 permit 10.3.1.30
+access-list 98 permit 10.3.17.15
+access-list 98 permit 10.2.1.20
+access-list 98 permit 10.2.1.23
+access-list 98 permit 10.3.1.36
+access-list 98 permit 10.65.1.20
+access-list 98 permit 10.129.1.20
+access-list 98 permit 10.5.146.60
+access-list 98 permit 10.2.4.170
+access-list 98 permit 10.2.146.60
+access-list 98 permit 10.3.17.16 0.0.0.7

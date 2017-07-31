@@ -1,0 +1,13 @@
+{# MUST include a trailing new line at the end of the file #}
+class-map match-any CITRIX
+  match access-group name CITRIX-QoS
+class-map match-any CONTROL
+  match ip dscp cs3
+  match ip dscp af31
+!
+!
+policy-map WANQoS
+  class CITRIX
+   set dscp af21
+  class CONTROL
+   set dscp cs3

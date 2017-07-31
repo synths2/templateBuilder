@@ -1,0 +1,6 @@
+{# MUST include a trailing new line at the end of the file #}
+tacacs-server host 10.2.1.149
+tacacs-server host 10.5.1.149
+tacacs-server host 10.65.1.149
+tacacs-server directed-request
+tacacs-server key 7 030959190B1C244F5C0C0D44

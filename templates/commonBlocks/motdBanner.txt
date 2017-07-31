@@ -1,0 +1,21 @@
+{# MUST include a trailing new line at the end of the file #}
+banner motd ^C
+
+                         ---------------
+                            WARNING!!!
+                         ---------------
+
+=================================================================
+\                                                               /
+\    You are attempting to access a private computer system.    /
+\      This system is the property of Mayer Brown LLP.          /
+\                                                               /
+\    Unauthorized use may subject you to criminal prosecution.  /
+\     Evidence of any such unauthorized use collected during    /
+\     monitoring may be used for administrative, criminal or    /
+\      other adverse action. Use of this system constitutes     /
+\          consent to monitoring for these purposes.            /
+\                                                               /
+=================================================================
+
+^C

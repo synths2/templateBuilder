@@ -1,0 +1,29 @@
+{# MUST include a trailing new line at the end of the file #}
+snmp-server community AyeDr8ChBr! RO 98
+snmp-server community wego2cisco! RW 98
+snmp-server enable traps msdp
+snmp-server enable traps pim neighbor-change rp-mapping-change invalid-pim-message
+snmp-server enable traps ipsla
+snmp-server enable traps slb real virtual csrp
+snmp-server enable traps bridge newroot topologychange
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps syslog
+snmp-server enable traps flex-links status
+snmp-server enable traps sonet
+snmp-server enable traps dial
+snmp-server enable traps fru-ctrl ps-output-change status
+snmp-server enable traps entity
+snmp-server enable traps rsvp
+snmp-server enable traps srp
+snmp-server enable traps vtp
+snmp-server enable traps vlancreate
+snmp-server enable traps vlandelete
+snmp-server enable traps flash insertion removal
+snmp-server enable traps c6kxbar intbus-crcexcd intbus-crcrcvrd
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps port-security
+snmp-server enable traps alarms informational
+snmp-server enable traps vlan-mac-limit
+snmp-server enable traps rf
+snmp-server host 10.65.1.20 AyeDr8ChBr! 
+snmp-server host 10.65.1.20 wego2cisco!  config ipsla entity envmon snmp

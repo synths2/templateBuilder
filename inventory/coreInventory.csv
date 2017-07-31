@@ -1,0 +1,2 @@
+hostName,serialNumber,platformId,site,mgmtIP,mgmtSM,mgmtGW,mgmtVlan,siteCode,guestSubnet1,guestSubnet2,siteSecondOctet,,,coreSwitchName,,vtpDomain,,,vlan_id_0,vlan_name_0,vlan_id_1,vlan_name_1,vlan_id_2,vlan_name_2
+par-crsw01,12345678901,WS-C2960X-48FPD-L,10 Hoche,10.10.10.101,255.255.255.0,1.1.1.1,310,PAR,,,73,,,PAR-CRSW01,,mbrm-par,,,310,mgmt,320,voice,330,access

@@ -1,0 +1,1214 @@
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service counters max age 5
+!
+hostname {{hostName|upper}}
+!
+logging buffered 8192
+{% include '/templates/commonBlocks/localCredentials.txt' %}
+!
+{% include '/templates/commonBlocks/aaaConfiguration.txt' %}
+!
+platform ip cef load-sharing ip-only
+!
+ip vrf management
+!
+ip dhcp excluded-address 172.30.96.0 172.30.96.10
+ip dhcp excluded-address 172.30.97.0 172.30.97.10
+ip dhcp excluded-address 172.30.98.0 172.30.98.10
+ip dhcp excluded-address 172.30.99.0 172.30.99.10
+ip dhcp excluded-address 172.30.100.0 172.30.100.10
+ip dhcp excluded-address 172.30.101.0 172.30.101.10
+ip dhcp excluded-address 172.30.102.0 172.30.102.10
+ip dhcp excluded-address 172.30.103.0 172.30.103.10
+ip dhcp excluded-address 172.30.104.0 172.30.104.10
+ip dhcp excluded-address 172.30.105.0 172.30.105.10
+ip dhcp excluded-address 172.30.106.0 172.30.106.10
+ip dhcp excluded-address 172.30.107.0 172.30.107.10
+ip dhcp excluded-address 172.30.108.0 172.30.108.10
+ip dhcp excluded-address 172.30.109.0 172.30.109.10
+ip dhcp excluded-address 172.30.110.0 172.30.110.10
+ip dhcp excluded-address 172.30.111.0 172.30.111.10
+!
+ip dhcp pool Guest-NETWORK
+   network 172.30.96.0 255.255.248.0
+   dns-server 8.8.8.8 8.8.4.4
+   default-router 172.30.96.1 
+!
+ip dhcp pool Guest-NETWORK-2
+   network 172.30.104.0 255.255.248.0
+   dns-server 8.8.8.8 8.8.4.4
+   default-router 172.30.104.1 
+!
+no ip domain-lookup
+ip domain-name mayerbrown.com
+vtp domain {{ vtpDomain }}
+vtp mode transparent
+!
+!
+!
+!
+!
+!
+switch virtual domain 9
+ switch mode virtual
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge bpduguard default
+no spanning-tree optimize bpdu transmission
+spanning-tree extend system-id
+spanning-tree vlan 1-4094 root primary
+!
+!
+!
+!
+!
+!
+!
+port-channel load-balance src-dst-mixed-ip-port
+!
+redundancy
+ main-cpu
+  auto-sync running-config
+ mode sso
+!
+vlan internal allocation policy ascending
+vlan access-log ratelimit 2000
+!
+{% for vlan_name, vlan_id in vlans.iteritems() %}
+vlan {{ vlan_id }}
+ name {{ vlan_name }}
+{%- endfor %}
+!
+vlan 800
+ name GUEST-NETWORK-1
+!
+vlan 801
+ name GUEST-NETWORK-2
+!
+vlan 998
+ name RSPAN
+!
+vlan 999
+ name Native-Trunk
+!
+{% include '/templates/commonBlocks/qosWAN.txt' %}
+!
+ip ssh rsa keypair-name {{ hostName|upper }}.mayerbrown.com
+ip ssh version 2
+!
+interface Loopback0
+ ip address 10.73.254.1 255.255.255.255
+!
+interface Port-channel1
+ description VSL Link From Switch 1 To Switch 2 - MONITOR
+ no switchport
+ no ip address
+ load-interval 30
+ no platform qos channel-consistency
+ switch virtual link 1
+ vslp interval 500 min_rx 10000 multiplier 36
+!
+interface Port-channel2
+ description VSL Link From Switch 2 To Switch 1 - MONITOR
+ no switchport
+ no ip address
+ load-interval 30
+ no platform qos channel-consistency
+ switch virtual link 2
+ vslp interval 500 min_rx 10000 multiplier 36
+!
+interface Port-channel3
+ description PAR-BASEMENT-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,300-307,800,801,999
+ switchport mode trunk
+!
+interface Port-channel4
+ description PAR-GROUND-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,310-317,800,801,999
+ switchport mode trunk
+!
+interface Port-channel5
+ description PAR-FLOOR1-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,320-327,800,801,999
+ switchport mode trunk
+!
+interface Port-channel6
+ description PAR-FLOOR2-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,330-337,800,801,999
+ switchport mode trunk
+!
+interface Port-channel7
+ description PAR-FLOOR3-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,340-347,800,801,999
+ switchport mode trunk
+!
+interface Port-channel8
+ description PAR-FLOOR4-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,350-357,800,801,999
+ switchport mode trunk
+!
+interface Port-channel9
+ description PAR-FLOOR5-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,360-367,800,801,999
+ switchport mode trunk
+!
+interface Port-channel10
+ description PAR-FLOOR6-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,370-377,800,801,999
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/1/1
+ description PAR-BASEMENT-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,300-307,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 3 mode desirable
+!
+interface TenGigabitEthernet1/1/2
+ description PAR-GROUND-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,310-317,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 4 mode desirable
+!
+interface TenGigabitEthernet1/1/3
+ description PAR-FLOOR1-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,320-327,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 5 mode desirable
+!
+interface TenGigabitEthernet1/1/4
+ description PAR-FLOOR2-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,330-337,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 6 mode desirable
+!
+interface TenGigabitEthernet1/1/5
+ description PAR-FLOOR3-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,340-347,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 7 mode desirable
+!
+interface TenGigabitEthernet1/1/6
+ description PAR-FLOOR4-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,350-357,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 8 mode desirable
+!
+interface TenGigabitEthernet1/1/7
+ description PAR-FLOOR5-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,360-367,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 9 mode desirable
+!
+interface TenGigabitEthernet1/1/8
+ description PAR-FLOOR6-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan vlan 2,370-377,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 10 mode desirable
+!
+interface TenGigabitEthernet1/1/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/11
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/12
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/13
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/15
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/1
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/2
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/5
+ no switchport
+ no ip address
+ shutdown 
+!
+interface TenGigabitEthernet1/5/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/8
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/11
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/12
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/13
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/15
+ description PAR-ATT-CE01 - MONITOR
+ no switchport
+ ip address 10.73.249.1 255.255.255.0
+ load-interval 30
+!
+interface TenGigabitEthernet1/5/16
+ description VSL Link From Switch 1 To Switch 2 - MONITOR
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 1 mode on
+!
+interface mgmt0
+ no ip address
+!
+interface TenGigabitEthernet2/1/1
+ description PAR-BASEMENT-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,300-307,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 3 mode desirable
+!
+interface TenGigabitEthernet2/1/2
+ description PAR-GROUND-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,310-317,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 4 mode desirable
+!
+interface TenGigabitEthernet2/1/3
+ description PAR-FLOOR1-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,320-327,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 5 mode desirable
+!
+interface TenGigabitEthernet2/1/4
+ description PAR-FLOOR2-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,330-337,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 6 mode desirable
+!
+interface TenGigabitEthernet2/1/5
+ description PAR-FLOOR3-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,340-347,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 7 mode desirable
+!
+interface TenGigabitEthernet2/1/6
+ description PAR-FLOOR4-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,350-357,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 8 mode desirable
+!
+interface TenGigabitEthernet2/1/7
+ description PAR-FLOOR5-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan 2,360-367,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 9 mode desirable
+!
+interface TenGigabitEthernet2/1/8
+ description PAR-FLOOR6-STACK1 - MONITOR
+ switchport
+ switchport trunk allowed vlan vlan 2,370-377,800,801,999
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 10 mode desirable
+!
+interface TenGigabitEthernet2/1/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/11
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/12
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/13
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/15
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/1
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/2
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/8
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/11
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/12
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/13
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/15
+ description PAR-IR-IPVPN-CE01 - MONITOR
+ no switchport
+ ip address 10.73.248.1 255.255.255.0
+ load-interval 30
+!
+interface TenGigabitEthernet2/5/16
+ description VSL Link From Switch 2 To Switch 1 - MONITOR 
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 2 mode on
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan2
+ description par-bb2-network
+ ip address 10.73.1.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface Vlan3
+ description par-bb3-server
+ ip address 10.73.2.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface Vlan4
+ description par-bb4-database
+ ip address 10.73.3.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface Vlan5
+ description par-bb5-financial
+ ip address 10.73.4.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface Vlan6
+ description par-bb6-desktop
+ ip address 10.73.5.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface Vlan7
+ description par-bb7-telecom
+ ip address 10.73.6.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface Vlan8
+ description par-bb8-iLo
+ ip address 10.73.7.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan300
+ description par-basement-1
+ ip address 10.73.16.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan301
+ description par-basement-2
+ ip address 10.73.17.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan302
+ description par-basement-w
+ ip address 10.73.18.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan303
+ description par-basement-p
+ ip address 10.73.19.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan304
+ description par-basement-v1
+ ip address 10.73.20.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan305
+ description par-basement-v2
+ ip address 10.73.21.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan306
+ description par-basement-AV
+ ip address 10.73.22.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan307
+ description par-basement-guest
+ ip address 10.73.23.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan310
+ description par-ground-1
+ ip address 10.73.24.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan311
+ description par-ground-2
+ ip address 10.73.25.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan312
+ description par-ground-w
+ ip address 10.73.26.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan313
+ description par-ground-p
+ ip address 10.73.27.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan314
+ description par-ground-v1
+ ip address 10.73.28.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan315
+ description par-ground-v2
+ ip address 10.73.29.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan316
+ description par-ground-AV
+ ip address 10.73.30.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan317
+ description par-ground-guest
+ ip address 10.73.31.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan320
+ description par-floor1-1
+ ip address 10.73.32.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan321
+ description par-floor1-2
+ ip address 10.73.33.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan322
+ description par-floor1-w
+ ip address 10.73.34.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan323
+ description par-floor1-p
+ ip address 10.73.35.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan324
+ description par-floor1-v1
+ ip address 10.73.36.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan325
+ description par-floor1-v2
+ ip address 10.73.37.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan326
+ description par-floor1-AV
+ ip address 10.73.38.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan327
+ description par-floor1-guest
+ ip address 10.73.39.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan330
+ description par-floor2-1
+ ip address 10.73.40.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan331
+ description par-floor2-2
+ ip address 10.73.41.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan332
+ description par-floor2-w
+ ip address 10.73.42.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan333
+ description par-floor2-p
+ ip address 10.73.43.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan334
+ description par-floor2-v1
+ ip address 10.73.44.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan335
+ description par-floor2-v2
+ ip address 10.73.45.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan336
+ description par-floor2-AV
+ ip address 10.73.46.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan337
+ description par-floor2-guest
+ ip address 10.73.47.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan340
+ description par-floor3-1
+ ip address 10.73.48.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan341
+ description par-floor3-2
+ ip address 10.73.49.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan342
+ description par-floor3-w
+ ip address 10.73.50.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan343
+ description par-floor3-p
+ ip address 10.73.51.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan344
+ description par-floor3-v1
+ ip address 10.73.52.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan345
+ description par-floor3-v2
+ ip address 10.73.53.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan346
+ description par-floor3-AV
+ ip address 10.73.54.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan347
+ description par-floor3-guest
+ ip address 10.73.55.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan350
+ description par-floor4-1
+ ip address 10.73.56.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan351
+ description par-floor4-2
+ ip address 10.73.57.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan352
+ description par-floor4-w
+ ip address 10.73.58.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan353
+ description par-floor4-p
+ ip address 10.73.59.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan354
+ description par-floor4-v1
+ ip address 10.73.60.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan355
+ description par-floor4-v2
+ ip address 10.73.61.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan356
+ description par-floor4-AV
+ ip address 10.73.62.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan357
+ description par-floor4-guest
+ ip address 10.73.63.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan360
+ description par-floor5-1
+ ip address 10.73.64.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan361
+ description par-floor5-2
+ ip address 10.73.65.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan362
+ description par-floor5-w
+ ip address 10.73.66.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan363
+ description par-floor5-p
+ ip address 10.73.67.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan364
+ description par-floor5-v1
+ ip address 10.73.68.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan365
+ description par-floor5-v2
+ ip address 10.73.69.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan366
+ description par-floor5-AV
+ ip address 10.73.70.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan367
+ description par-floor5-guest
+ ip address 10.73.71.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan370
+ description par-floor6-1
+ ip address 10.73.72.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan371
+ description par-floor6-2
+ ip address 10.73.73.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan372
+ description par-floor6-w
+ ip address 10.73.74.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan373
+ description par-floor6-p
+ ip address 10.73.75.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan374
+ description par-floor6-v1
+ ip address 10.73.76.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan375
+ description par-floor6-v2
+ ip address 10.73.77.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan376
+ description par-floor6-AV
+ ip address 10.73.78.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface vlan377
+ description par-floor6-guest
+ ip address 10.73.79.1 255.255.255.0
+ ip helper-address 10.73.2.50
+ ip helper-address 10.73.5.50
+ ip helper-address 10.65.2.127
+ no ip redirects
+!
+interface Vlan800
+ description Guest Network 1
+ ip address 172.30.96.1 255.255.248.0
+ ip access-group Guest-Network-ACL in
+ load-interval 30
+!
+interface Vlan801
+ description Guest Network 2
+ ip address 172.30.104.1 255.255.248.0
+ ip access-group Guest-Network-ACL in
+ load-interval 30
+!
+router bgp 55073
+ bgp router-id 10.73.254.1
+ bgp log-neighbor-changes
+ network 10.73.0.0 mask 255.255.0.0
+ network 172.30.96.0 mask 255.255.248.0
+ network 172.30.104.0 mask 255.255.248.0
+ neighbor 10.73.248.2 remote-as xxxxx
+ neighbor 10.73.248.2 soft-reconfiguration inbound
+ neighbor 10.73.248.2 prefix-list INTEROUTE-LOCAL-SUBNET out
+ neighbor 10.73.249.2 remote-as xxxxx
+ neighbor 10.73.249.2 soft-reconfiguration inbound
+ neighbor 10.73.249.2 prefix-list ATT-LOCAL-SUBNET out
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+
+ip route 10.73.0.0 255.255.0.0 Null0 254
+ip route 172.30.96.0 255.255.240.0 Null0 254
+!
+ip access-list extended CITRIX-QoS
+ remark *** ICA [TCP port 1494]***
+ permit tcp any any eq 1494
+ remark *** CGP [TCP port 2598]***
+ permit tcp any any eq 2598
+ip access-list extended Guest-Network-ACL
+ permit udp any any eq domain
+ permit icmp any host 172.30.96.1
+ deny   tcp any 172.30.0.0 0.0.255.255 eq 22
+ deny   tcp any 172.30.0.0 0.0.255.255 eq telnet
+ deny   ip any 10.0.0.0 0.255.255.255
+ deny   icmp any 10.0.0.0 0.255.255.255
+ permit icmp any any
+ permit ip any any
+ip access-list extended MGT_ACCESS
+ remark *** Orion Nodes ***
+ permit tcp host 10.2.1.20 any eq telnet
+ permit tcp host 10.3.1.30 any eq telnet
+ permit tcp host 10.65.1.20 any eq telnet
+ permit tcp host 10.129.1.20 any eq telnet
+ remark *** Internal Networks ***
+ permit tcp 10.0.0.0 0.255.255.255 any eq 22
+ permit tcp 143.58.0.0 0.0.255.255 any eq 22
+!
+ip prefix-list ATT-LOCAL-SUBNET description ATT BGP Advertisement
+ip prefix-list ATT-LOCAL-SUBNET seq 5 permit 10.73.0.0/16
+ip prefix-list ATT-LOCAL-SUBNET seq 10 permit 172.30.96.0/21
+ip prefix-list ATT-LOCAL-SUBNET seq 15 permit 172.30.104.0/21
+!
+ip prefix-list INTEROUTE-LOCAL-SUBNET description Interoute BGP Advertisement
+ip prefix-list INTEROUTE-LOCAL-SUBNET seq 5 permit 10.73.0.0/16
+ip prefix-list INTEROUTE-LOCAL-SUBNET seq 10 permit 172.30.96.0/20
+!
+logging source-interface Loopback0
+logging host 10.2.1.52
+{% include '/templates/commonBlocks/snmpACL.txt' %}
+
+{% include '/templates/commonBlocks/snmpCoreConfig.txt' %}
+
+{% include '/templates/commonBlocks/tacacsConfig.txt' %}
+!
+!
+!
+!
+{% include '/templates/commonBlocks/lineConfigurations.txt' %}
+!
+!
+!
+{% include '/templates/commonBlocks/ntpServers.txt' %}
+
+diagnostic bootup level minimal
+no event manager policy Mandatory.go_switchbus.tcl type system
+!
+!
+!
+end

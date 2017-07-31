@@ -1,0 +1,3 @@
+hostName,serialNumber,platformId,site,mgmtIP,mgmtSM,mgmtGW,mgmtVlan,siteCode,floorNumber,stackNumber,uplinkPortChannel,coreSwitchName,stackMembers,vtpDomain,snmpRW,snmpRO,vlan_id_0,vlan_name_0,vlan_id_1,vlan_name_1,vlan_id_2,vlan_name_2
+par-ground-stack01,12345678901,WS-C2960X-48FPD-L,10 Hoche,10.10.10.101,255.255.255.0,1.1.1.1,310,PAR,Ground,1,4,PAR-CRSW01,3,mbrm-par,private,public,310,mgmt,320,voice,330,access
+par-floor1-stack01,12345678902,WS-C2960X-48FPD-L,10 Hoche,10.10.10.101,255.255.255.0,1.1.1.1,310,PAR,1,1,5,PAR-CRSW01,3,mbrm-par,private,public,310,mgmt,320,voice,330,access

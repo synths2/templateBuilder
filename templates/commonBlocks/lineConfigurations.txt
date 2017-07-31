@@ -1,0 +1,17 @@
+{# MUST include a trailing new line at the end of the file #}
+line con 0
+ exec-timeout 15 0
+ password 7 13061E010803
+ logging synchronous
+line vty 0 4
+ access-class MGT_ACCESS in
+ exec-timeout 15 0
+ password 7 13061E010803
+ logging synchronous
+ transport input telnet ssh
+line vty 5 15
+ access-class MGT_ACCESS in
+ exec-timeout 15 0
+ password 7 060506324F41
+ logging synchronous
+ transport input telnet ssh
