@@ -1,5 +1,5 @@
 IPAM_HOST="ame-netswcol02.americas.global-legal.com"
 IPAM_USER="ipamAPI"
 IPAM_PW="uU5khJ1o9c1o"
-
+SITE_CSV="inventory/paris.csv"
 IPAM_BASE_URL="/Orion/IPAM/"

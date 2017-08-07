@@ -33,7 +33,7 @@ def transform_vlan_data(row):
     # values to the actual "vlan_id_<n>" values.  we want to create a new
     # entry in the original dictionary called 'vlans' to store this new
     # vlan dictionary.  We also need to handle the case when the vlan name
-    # has whitespace; so covert spaces to underscoores (_).
+    # has whitespace; so covert spaces to underscores (_).
 
     row['vlans'] = {
         vlan_fields[f].replace(' ', '_'): vlan_fields[f.replace('name', 'id')]
@@ -57,10 +57,11 @@ def build_templates(template_file, devices):
     try:
         reader = csv.DictReader(f)
         for dict_row in reader:
-            transform_vlan_data(dict_row)
+            #transform_vlan_data(dict_row)
             outputtext = template.render(dict_row)
 
-            config_filename = CONFIGS_DIR + dict_row['hostName'] + '-config'
+            #config_filename = CONFIGS_DIR + dict_row['hostName'] + '-config'
+            config_filename = CONFIGS_DIR + dict_row['siteCode'] + '-' + dict_row['floorNumber'] + '-stack' + dict_row['stackNumber'] + '-config'
             with open(config_filename, 'w') as config_file:
                 config_file.write(outputtext)
             print("wrote file: %s" % config_filename)

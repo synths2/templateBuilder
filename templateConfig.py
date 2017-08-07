@@ -1,3 +1,3 @@
 CONFIGS_DIR= "./configs/"
-DEVICES="inventory/inventory.csv"
-TEMPLATE="./templates/3850-1.txt"
+DEVICES="inventory/accessInventory.csv"
+TEMPLATE="./templates/3850-access-v1.txt"
