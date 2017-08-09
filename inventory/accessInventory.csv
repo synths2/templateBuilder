@@ -2,7 +2,8 @@ siteCode,secondOctet,city,firstLineAddress,floorNumber,stackNumber,stackMembers,
 PAR,73,Paris,10 Avenue Hoche,Basement,1,3,0
 PAR,73,Paris,10 Avenue Hoche,Ground,1,3,1
 PAR,73,Paris,10 Avenue Hoche,Floor1,1,3,2
-WDC,17,Washington DC,"1999 K Street, N.W.",Basement,1,3,0
-WDC,17,Washington DC,"1999 K Street, N.W.",Floor1,1,3,1
-WDC,17,Washington DC,"1999 K Street, N.W.",Floor2,1,7,2
-WDC,17,Washington DC,"1999 K Street, N.W.",Floor3,1,4,3
+PAR,73,Paris,10 Avenue Hoche,Floor2,1,3,3
+PAR,73,Paris,10 Avenue Hoche,Floor3,1,3,4
+PAR,73,Paris,10 Avenue Hoche,Floor4,1,3,5
+PAR,73,Paris,10 Avenue Hoche,Floor5,1,3,6
+PAR,73,Paris,10 Avenue Hoche,Floor6,1,3,7

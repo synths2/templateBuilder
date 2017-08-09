@@ -1,3 +1,5 @@
-CONFIGS_DIR= "./configs/"
-DEVICES="inventory/accessInventory.csv"
-TEMPLATE="./templates/3850-access-v1.txt"
+CONFIGS_DIR = "./configs/"
+ACCESSDEVICES = "inventory/accessInventory.csv"
+COREDEVICES = "inventory/coreInventory.csv"
+ACCESSTEMPLATE = "./templates/3850-access-v1.txt"
+CORETEMPLATE = "./templates/6840-core-vss-v1.txt"

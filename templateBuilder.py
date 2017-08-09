@@ -8,7 +8,7 @@ import jinja2
 import csv
 import sys
 import os.path
-from templateConfig import CONFIGS_DIR, TEMPLATE, DEVICES
+from templateConfig import CONFIGS_DIR, ACCESSTEMPLATE,ACCESSDEVICES,COREDEVICES,CORETEMPLATE
 
 
 ## ---------------------------------------------------------------------------
@@ -48,19 +48,23 @@ def transform_vlan_data(row):
 ## before asking the template to render and stores the output in ./configs
 ## ---------------------------------------------------------------------------
 
-def build_templates(template_file, devices):
+
+def build_access_templates(template_file, devices):
     templateLoader = jinja2.FileSystemLoader(searchpath=".")
     templateEnv = jinja2.Environment(loader=templateLoader)
     template = templateEnv.get_template(template_file)
 
+    global switchStacks
+
     f = open(devices, 'rt')
+
     try:
         reader = csv.DictReader(f)
         for dict_row in reader:
+            switchStacks = switchStacks + 1
             #transform_vlan_data(dict_row)
             outputtext = template.render(dict_row)
 
-            #config_filename = CONFIGS_DIR + dict_row['hostName'] + '-config'
             config_filename = CONFIGS_DIR + dict_row['siteCode'] + '-' + dict_row['floorNumber'] + '-stack' + dict_row['stackNumber'] + '-config'
             with open(config_filename, 'w') as config_file:
                 config_file.write(outputtext)
@@ -70,5 +74,30 @@ def build_templates(template_file, devices):
         f.close()
 
 
+def build_core_templates(template_file, devices):
+    templateLoader = jinja2.FileSystemLoader(searchpath=".")
+    templateEnv = jinja2.Environment(loader=templateLoader)
+    template = templateEnv.get_template(template_file)
+
+    global switchStacks
+
+    f = open(devices, 'rt')
+
+    try:
+        reader = csv.DictReader(f)
+        for dict_row in reader:
+            outputtext = template.render(dict_row)
+
+            config_filename = CONFIGS_DIR + dict_row['siteCode'] + '-CRSW01' + '-config'
+            with open(config_filename, 'w') as config_file:
+                config_file.write(outputtext)
+            print("wrote file: %s" % config_filename)
+
+    finally:
+        f.close()
+
 if __name__ == "__main__":
-    build_templates(TEMPLATE, DEVICES)
+    switchStacks = 0
+    build_access_templates(ACCESSTEMPLATE, ACCESSDEVICES)
+    print("Number of switch stacks found is: " + switchStacks.__str__())
+    build_core_templates(CORETEMPLATE, COREDEVICES)
