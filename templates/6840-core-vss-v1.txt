@@ -174,64 +174,64 @@ interface TenGigabitEthernet1/1/1
  switchport
  switchport trunk allowed vlan 2,300-307,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 3 mode desirable
+ channel-protocol lacp
+ channel-group 3 mode active
 !
 interface TenGigabitEthernet1/1/2
  description PAR-GROUND-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,310-317,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 4 mode desirable
+ channel-protocol lacp
+ channel-group 4 mode active
 !
 interface TenGigabitEthernet1/1/3
  description PAR-FLOOR1-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,320-327,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 5 mode desirable
+ channel-protocol lacp
+ channel-group 5 mode active
 !
 interface TenGigabitEthernet1/1/4
  description PAR-FLOOR2-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,330-337,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 6 mode desirable
+ channel-protocol lacp
+ channel-group 6 mode active
 !
 interface TenGigabitEthernet1/1/5
  description PAR-FLOOR3-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,340-347,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 7 mode desirable
+ channel-protocol lacp
+ channel-group 7 mode active
 !
 interface TenGigabitEthernet1/1/6
  description PAR-FLOOR4-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,350-357,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 8 mode desirable
+ channel-protocol lacp
+ channel-group 8 mode active
 !
 interface TenGigabitEthernet1/1/7
  description PAR-FLOOR5-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,360-367,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 9 mode desirable
+ channel-protocol lacp
+ channel-group 9 mode active
 !
 interface TenGigabitEthernet1/1/8
  description PAR-FLOOR6-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan vlan 2,370-377,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 10 mode desirable
+ channel-protocol lacp
+ channel-group 10 mode active
 !
 interface TenGigabitEthernet1/1/9
  no switchport
@@ -364,64 +364,64 @@ interface TenGigabitEthernet2/1/1
  switchport
  switchport trunk allowed vlan 2,300-307,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 3 mode desirable
+ channel-protocol lacp
+ channel-group 3 mode active
 !
 interface TenGigabitEthernet2/1/2
  description PAR-GROUND-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,310-317,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 4 mode desirable
+ channel-protocol lacp
+ channel-group 4 mode active
 !
 interface TenGigabitEthernet2/1/3
  description PAR-FLOOR1-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,320-327,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 5 mode desirable
+ channel-protocol lacp
+ channel-group 5 mode active
 !
 interface TenGigabitEthernet2/1/4
  description PAR-FLOOR2-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,330-337,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 6 mode desirable
+ channel-protocol lacp
+ channel-group 6 mode active
 !
 interface TenGigabitEthernet2/1/5
  description PAR-FLOOR3-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,340-347,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 7 mode desirable
+ channel-protocol lacp
+ channel-group 7 mode active
 !
 interface TenGigabitEthernet2/1/6
  description PAR-FLOOR4-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,350-357,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 8 mode desirable
+ channel-protocol lacp
+ channel-group 8 mode active
 !
 interface TenGigabitEthernet2/1/7
  description PAR-FLOOR5-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan 2,360-367,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 9 mode desirable
+ channel-protocol lacp
+ channel-group 9 mode active
 !
 interface TenGigabitEthernet2/1/8
  description PAR-FLOOR6-STACK1 - MONITOR
  switchport
  switchport trunk allowed vlan vlan 2,370-377,800,801,999
  switchport mode trunk
- channel-protocol pagp
- channel-group 10 mode desirable
+ channel-protocol lacp
+ channel-group 10 mode active
 !
 interface TenGigabitEthernet2/1/9
  no switchport
