@@ -82,7 +82,7 @@ def build_access_templates(template_file, devices):
 
 def build_core_templates(template_file, devices):
     templateLoader = jinja2.FileSystemLoader(searchpath=".")
-    templateEnv = jinja2.Environment(loader=templateLoader)
+    templateEnv = jinja2.Environment(loader=templateLoader,extensions=["jinja2.ext.do",])
     template = templateEnv.get_template(template_file)
 
     global switchStacks
