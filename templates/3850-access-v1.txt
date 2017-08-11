@@ -2,9 +2,9 @@
 {%- set hostName = siteCode ~ "-" ~ floorNumber ~ "-stack-" ~ stackNumber %}
 {%- set snmpLocation = city ~ ", " ~ firstLineAddress %}
 {%- set vtpDomain = "mbrm-" ~ siteCode|lower %}
-{%- set firstVlan = 300 + (relativeFloorNumber|int * 10) %}
+{%- set firstVlan = 300 + (relativeSwitchNumber|int * 10) %}
 {%- set mgmtVlan = firstVlan %}
-{%- set mgmtThirdOctet = (relativeFloorNumber|int+2) * 8 %}
+{%- set mgmtThirdOctet = (relativeSwitchNumber|int+2) * 8 %}
 {%- set mgmtIP = "10." ~ secondOctet|string ~ "." ~ mgmtThirdOctet|string ~ ".10" %}
 {%- set mgmtGW = "10." ~ secondOctet|string ~ "." ~ mgmtThirdOctet|string ~ ".1" %}
 {%- set stackAccessVLAN1 = firstVlan %}
@@ -69,35 +69,35 @@ vlan {{ vlan_id }}
 #}
 
 vlan {{ firstVlan|int }}
- {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-1" %}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ stackNumber ~ "-1" %}
  name {{ vlanName }}
 !
 vlan {{ firstVlan|int +1 }}
- {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-2" %}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ stackNumber ~ "-2" %}
  name {{ vlanName }}
 !
 vlan {{ firstVlan|int +2 }}
- {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-w" %}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ stackNumber ~ "-w" %}
  name {{ vlanName }}
 !
 vlan {{ firstVlan|int +3 }}
- {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-p" %}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ stackNumber ~ "-p" %}
  name {{ vlanName }}
 !
 vlan {{ firstVlan|int +4 }}
- {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-v1" %}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ stackNumber ~ "-v1" %}
  name {{ vlanName }}
 !
 vlan {{ firstVlan|int +5 }}
- {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-v2" %}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ stackNumber ~ "-v2" %}
  name {{ vlanName }}
 !
 vlan {{ firstVlan|int +6 }}
- {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-AV" %}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ stackNumber ~ "-AV" %}
  name {{ vlanName }}
 !
 vlan {{ firstVlan|int +7 }}
- {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-guest" %}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ stackNumber ~ "-guest" %}
  name {{ vlanName }}
 !
 vlan 800
@@ -368,7 +368,7 @@ ip default-gateway {{ mgmtGW }}
 no ip http server
 no ip http authentication local
 no ip http secure-server
-ip tacacs source-interface {{ mgmtVlan }}
+ip tacacs source-interface vlan {{ mgmtVlan }}
 !
 ip access-list extended MGT_ACCESS
  remark *** Orion Nodes ***
@@ -384,7 +384,7 @@ logging buffered 16384
 no logging console
 no logging monitor
 logging trap notifications
-logging source-interface {{ mgmtVlan }}
+logging source-interface vlan {{ mgmtVlan }}
 logging host 10.2.1.52
 
 {% include '/templates/commonBlocks/snmpACL.txt' %}

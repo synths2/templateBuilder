@@ -1,4 +1,4 @@
-siteCode,secondOctet,city,firstLineAddress,floorNumber,stackNumber,stackMembers,relativeFloorNumber
+siteCode,secondOctet,city,firstLineAddress,floorNumber,stackNumber,stackMembers,relativeSwitchNumber
 PAR,73,Paris,10 Avenue Hoche,Basement,1,3,0
 PAR,73,Paris,10 Avenue Hoche,Ground,1,3,1
 PAR,73,Paris,10 Avenue Hoche,Floor1,1,3,2
@@ -7,3 +7,4 @@ PAR,73,Paris,10 Avenue Hoche,Floor3,1,3,4
 PAR,73,Paris,10 Avenue Hoche,Floor4,1,3,5
 PAR,73,Paris,10 Avenue Hoche,Floor5,1,3,6
 PAR,73,Paris,10 Avenue Hoche,Floor6,1,3,7
+PAR,73,Paris,10 Avenue Hoche,Floor6,2,3,8

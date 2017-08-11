@@ -55,6 +55,8 @@ def build_access_templates(template_file, devices):
     template = templateEnv.get_template(template_file)
 
     global switchStacks
+    global floorStacks
+
 
     f = open(devices, 'rt')
 
@@ -62,7 +64,11 @@ def build_access_templates(template_file, devices):
         reader = csv.DictReader(f)
         for dict_row in reader:
             switchStacks = switchStacks + 1
-            #transform_vlan_data(dict_row)
+            floorNumber = dict_row['floorNumber']
+            stackNumber = dict_row['stackNumber']
+            #print("floor number is " + floorNumber + ", stackNumber is " + stackNumber)
+            floorStacks[floorNumber] = stackNumber
+
             outputtext = template.render(dict_row)
 
             config_filename = CONFIGS_DIR + dict_row['siteCode'] + '-' + dict_row['floorNumber'] + '-stack' + dict_row['stackNumber'] + '-config'
@@ -80,12 +86,17 @@ def build_core_templates(template_file, devices):
     template = templateEnv.get_template(template_file)
 
     global switchStacks
+    global floorStacks
 
     f = open(devices, 'rt')
 
     try:
         reader = csv.DictReader(f)
         for dict_row in reader:
+
+            print(floorStacks)
+            dict_row['switchStacks'] = switchStacks
+            dict_row['floorStacks'] = floorStacks
             outputtext = template.render(dict_row)
 
             config_filename = CONFIGS_DIR + dict_row['siteCode'] + '-CRSW01' + '-config'
@@ -98,6 +109,8 @@ def build_core_templates(template_file, devices):
 
 if __name__ == "__main__":
     switchStacks = 0
+    floorStacks = {}
+
     build_access_templates(ACCESSTEMPLATE, ACCESSDEVICES)
     print("Number of switch stacks found is: " + switchStacks.__str__())
     build_core_templates(CORETEMPLATE, COREDEVICES)
