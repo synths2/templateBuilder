@@ -6,6 +6,7 @@
 from __future__ import print_function
 import jinja2
 import csv
+import collections
 import sys
 import os.path
 from templateConfig import CONFIGS_DIR, ACCESSTEMPLATE,ACCESSDEVICES,COREDEVICES,CORETEMPLATE
@@ -56,7 +57,7 @@ def build_access_templates(template_file, devices):
 
     global switchStacks
     global floorStacks
-
+    global orderedFloorStacks
 
     f = open(devices, 'rt')
 
@@ -67,8 +68,8 @@ def build_access_templates(template_file, devices):
             floorNumber = dict_row['floorNumber']
             stackNumber = dict_row['stackNumber']
             #print("floor number is " + floorNumber + ", stackNumber is " + stackNumber)
-            floorStacks[floorNumber] = stackNumber
-
+            orderedFloorStacks[floorNumber] = stackNumber
+            #orderedFloorStacks = collections.OrderedDict((floorStacks.items()))
             outputtext = template.render(dict_row)
 
             config_filename = CONFIGS_DIR + dict_row['siteCode'] + '-' + dict_row['floorNumber'] + '-stack' + dict_row['stackNumber'] + '-config'
@@ -86,7 +87,7 @@ def build_core_templates(template_file, devices):
     template = templateEnv.get_template(template_file)
 
     global switchStacks
-    global floorStacks
+    global orderedFloorStacks
 
     f = open(devices, 'rt')
 
@@ -94,9 +95,9 @@ def build_core_templates(template_file, devices):
         reader = csv.DictReader(f)
         for dict_row in reader:
 
-            print(floorStacks)
+            print(orderedFloorStacks)
             dict_row['switchStacks'] = switchStacks
-            dict_row['floorStacks'] = floorStacks
+            dict_row['floorStacks'] = orderedFloorStacks
             outputtext = template.render(dict_row)
 
             config_filename = CONFIGS_DIR + dict_row['siteCode'] + '-CRSW01' + '-config'
@@ -110,7 +111,7 @@ def build_core_templates(template_file, devices):
 if __name__ == "__main__":
     switchStacks = 0
     floorStacks = {}
-
+    orderedFloorStacks = collections.OrderedDict(floorStacks)
     build_access_templates(ACCESSTEMPLATE, ACCESSDEVICES)
     print("Number of switch stacks found is: " + switchStacks.__str__())
     build_core_templates(CORETEMPLATE, COREDEVICES)
