@@ -10,9 +10,9 @@ service counters max age 5
 hostname {{ coreSwitchName|upper }}
 !
 logging buffered 64192
-{% include '/templates/commonBlocks/localCredentials.txt' %}
+{%- include '/templates/commonBlocks/localCredentials.txt' %}
 !
-{% include '/templates/commonBlocks/aaaConfiguration.txt' %}
+{%- include '/templates/commonBlocks/aaaConfiguration.txt' %}
 !
 platform ip cef load-sharing ip-only
 !
@@ -220,7 +220,6 @@ interface TenGigabitEthernet2/1/40
 !
 interface mgmt0
  no ip address
-!
 !
 interface Vlan1
  no ip address
