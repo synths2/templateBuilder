@@ -32,11 +32,10 @@ vrf definition Mgmt-vrf
  address-family ipv6
  exit-address-family
 !
-{% include '/templates/commonBlocks/localCredentials.txt' %}
+{%- include '/templates/commonBlocks/localCredentials.txt' %}
 !
-{% include '/templates/commonBlocks/aaaConfiguration.txt' %}
+{%- include '/templates/commonBlocks/aaaConfiguration.txt' %}
 !
-clock timezone CET 2 0
 !
 {#- Calculate the number of switches in the stack and start from 1 instead of 0 #}
 {%- set numberSwitches = stackMembers| int +1 %}
@@ -62,7 +61,7 @@ redundancy
  mode sso
 !
 {#
-{% for vlan_name, vlan_id in vlans.iteritems() %}
+{%- for vlan_name, vlan_id in vlans.iteritems() %}
 vlan {{ vlan_id }}
  name {{ vlan_name }}
 {%- endfor %}
@@ -111,13 +110,10 @@ vlan 999
 !
 lldp run
 !
-interface port-channel 1
+{%- set portchannelNumber = 3 + relativeSwitchNumber|int %}
+interface port-channel {{ portchannelNumber }}
  description Channel to {{ coreSwitchName }} - MONITOR
- {# {%- for vlan_name,vlan_id in vlans.iteritems() %}
- 	switchport trunk allowed vlan add {{ vlan_id }}
- {%- endfor %}
- #}
- switchport trunk allowed vlan remove 1
+ switchport trunk allowed vlan add 2,{{ firstVlan }}-{{ firstVlan +7 }},800,801,999
  switchport mode trunk
 !
 interface GigabitEthernet0/0
@@ -125,7 +121,9 @@ interface GigabitEthernet0/0
  no ip address
  negotiation auto
 !
-interface range GigabitEthernet1/0/1 - 35
+{%- set numberSwitches = stackMembers| int +1 %}
+{%- for switch in range(1,numberSwitches) %}
+interface range GigabitEthernet{{ switch }}/0/1 - 35
  description {{ siteCode }}-{{ floorNumber }}-{{ stackNumber }}
  switchport access vlan {{ stackAccessVLAN1 }}
  switchport mode access
@@ -135,7 +133,7 @@ interface range GigabitEthernet1/0/1 - 35
  spanning-tree portfast
  no shutdown
 !
-interface range GigabitEthernet1/0/36 - 37
+interface range GigabitEthernet{{ switch }}/0/36 - 37
  description time-recording terminal
  switchport mode access
  no logging event link-status
@@ -143,7 +141,7 @@ interface range GigabitEthernet1/0/36 - 37
  spanning-tree portfast
  no shutdown
 !
-interface GigabitEthernet1/0/38
+interface GigabitEthernet{{ switch }}/0/38
  description {{ siteCode }}-{{ floorNumber }}-AV
  switchport access vlan {{ stackAVVLAN }}
  switchport mode access
@@ -151,7 +149,7 @@ interface GigabitEthernet1/0/38
  no snmp trap link-status
  spanning-tree portfast
 !
-interface range GigabitEthernet1/0/39 - 42
+interface range GigabitEthernet{{ switch }}/0/39 - 42
  description {{ siteCode }}-{{ floorNumber }}-w
  switchport trunk encapsulation dot1q
  switchport trunk native vlan {{ stackWifiVLAN }}
@@ -161,7 +159,7 @@ interface range GigabitEthernet1/0/39 - 42
  spanning-tree portfast
  no shutdown
 !
-interface range GigabitEthernet1/0/43 - 48
+interface range GigabitEthernet{{ switch }}/0/43 - 48
  description {{ siteCode }}-{{ floorNumber }}-p
  switchport access vlan {{ stackPrintingVLAN }}
  switchport mode access
@@ -170,191 +168,37 @@ interface range GigabitEthernet1/0/43 - 48
  spanning-tree portfast
  no shutdown
 !
-interface GigabitEthernet1/1/1
+interface GigabitEthernet{{ switch }}/1/1
 shutdown
 !
-interface GigabitEthernet1/1/2
+interface GigabitEthernet{{ switch }}/1/2
 shutdown
 !
-interface TenGigabitEthernet1/1/1
+interface TenGigabitEthernet{{ switch }}/1/1
  shutdown
 !
-interface TenGigabitEthernet1/1/2
+interface TenGigabitEthernet{{ switch }}/1/2
  shutdown
 !
-interface TenGigabitEthernet1/1/3
+{%- if switch == 1 or switch == stackMembers|int %}
+interface TenGigabitEthernet{{ switch }}/1/3
  description {{ coreSwitchName }} - MONITOR
- {#-
- {%-- for vlan_name,vlan_id in vlans.iteritems() %}
- 	switchport trunk allowed vlan add {{ vlan_id }}
- {%- endfor %}
- #}
- switchport trunk allowed vlan remove 1
+ switchport trunk allowed vlan add 2,{{ firstVlan }}-{{ firstVlan +7 }},800,801,999
  switchport mode trunk
  channel-protocol lacp
  channel-group 1  mode active
  no shutdown
 !
-interface TenGigabitEthernet1/1/4
+{%- else %}
+interface TenGigabitEthernet{{ switch }}/1/3
+ shutdown
+!
+{%- endif %}
+interface TenGigabitEthernet{{ switch }}/1/4
  shutdown 
 !
-{% if stackMembers|int >1 %}
-interface range GigabitEthernet2/0/1 - 35
- description {{ siteCode }}-{{ floorNumber }}-{{ stackNumber }}
- switchport access vlan {{ stackAccessVLAN2 }}
- switchport mode access
- no logging event link-status
- no snmp trap link-status
- switchport voice vlan {{ stackVoiceVLAN2 }}
- spanning-tree portfast
- no shutdown
+{%- endfor %}
 !
-interface range GigabitEthernet2/0/36 - 37
- description time-recording terminal
- switchport mode access
- no logging event link-status
- no snmp trap link-status
- spanning-tree portfast
- no shutdown
-!
-interface GigabitEthernet2/0/38
- description {{ siteCode }}-{{ floorNumber }}-AV
- switchport access vlan {{ stackAVVLAN }}
- switchport mode access
- no logging event link-status
- no snmp trap link-status
- spanning-tree portfast
-!
-interface range GigabitEthernet2/0/39 - 42
- description {{ siteCode }}-{{ floorNumber }}-w
- switchport trunk encapsulation dot1q
- switchport trunk native vlan {{ stackWifiVLAN }}
- switchport trunk allowed vlan {{ stackWifiVLAN }},800,801
- switchport mode trunk
- logging event link-status
- spanning-tree portfast
- no shutdown
-!
-interface range GigabitEthernet2/0/43 - 48
- description {{ siteCode }}-{{ floorNumber }}-p
- switchport access vlan {{ stackPrintingVLAN }}
- switchport mode access
- no logging event link-status
- no snmp trap link-status
- spanning-tree portfast
- no shutdown
-!
-interface GigabitEthernet2/1/1
- shutdown
-!
-interface GigabitEthernet2/1/2
- shutdown
-!
-interface TenGigabitEthernet2/1/1
- shutdown
-!
-interface TenGigabitEthernet2/1/2
- shutdown
-!
-{% if stackMembers|int < 3 %}
-interface TenGigabitEthernet2/1/3
- description {{ coreSwitchName }} - MONITOR
- {#
- {%- for vlan_name,vlan_id in vlans.iteritems() %}
- 	switchport trunk allowed vlan add {{ vlan_id }}
- {%- endfor %}
- #}
- switchport trunk allowed vlan remove 1
- switchport mode trunk
- channel-protocol lacp
- channel-group 1 mode active
- no shutdown
-
-{% else %}
-interface TenGigabitEthernet2/1/3
- shutdown
-{% endif %}
-!
-interface TenGigabitEthernet2/1/4
- shutdown 
-!
-{% endif %}
-{% if stackMembers|int > 2 %}
-interface range GigabitEthernet3/0/1 - 35
- description {{ siteCode }}-{{ floorNumber }}-{{ stackNumber }}
- switchport access vlan {{ stackAccessVLAN1 }}
- switchport mode access
- no logging event link-status
- no snmp trap link-status
- switchport voice vlan {{ stackVoiceVLAN1 }}
- spanning-tree portfast
- no shutdown
-!
-interface range GigabitEthernet3/0/36 - 37
- description time-recording terminal
- switchport mode access
- no logging event link-status
- no snmp trap link-status
- spanning-tree portfast
- no shutdown
-!
-interface GigabitEthernet3/0/38
- description {{ siteCode }}-{{ floorNumber }}-AV
- switchport access vlan {{ stackAVVLAN }}
- switchport mode access
- no logging event link-status
- no snmp trap link-status
- spanning-tree portfast
-!
-interface range GigabitEthernet3/0/39 - 42
- description {{ siteCode }}-{{ floorNumber }}-w
- switchport trunk encapsulation dot1q
- switchport trunk native vlan {{ stackWifiVLAN }}
- switchport trunk allowed vlan {{ stackWifiVLAN }},800,801
- switchport mode trunk
- logging event link-status
- spanning-tree portfast
- no shutdown
-!
-interface range GigabitEthernet3/0/43 - 48
- description {{ siteCode }}-{{ floorNumber }}-p
- switchport access vlan {{ stackPrintingVLAN }}
- switchport mode access
- no logging event link-status
- no snmp trap link-status
- spanning-tree portfast
- no shutdown
-!
-interface GigabitEthernet3/1/1
-shutdown
-!
-interface GigabitEthernet3/1/2
-shutdown
-!
-interface TenGigabitEthernet3/1/1
- shutdown
-!
-interface TenGigabitEthernet3/1/2
- shutdown
-!
-interface TenGigabitEthernet3/1/3
- description {{ coreSwitchName }} - MONITOR
- {#
- {%- for vlan_name,vlan_id in vlans.iteritems() %}
- 	switchport trunk allowed vlan add {{ vlan_id }}
- {%- endfor %}
- #}
- switchport trunk allowed vlan remove 1
- switchport mode trunk
- channel-protocol lacp
- channel-group 1 mode active
- no shutdown
-!
-!
-interface TenGigabitEthernet3/1/4
- shutdown 
-!
-{% endif %}
 interface Vlan1
  no ip address
  shutdown
@@ -386,18 +230,18 @@ no logging monitor
 logging trap notifications
 logging source-interface vlan {{ mgmtVlan }}
 logging host 10.2.1.52
-
-{% include '/templates/commonBlocks/snmpACL.txt' %}
 !
-{% include '/templates/commonBlocks/snmpAccessConfig.txt' %}
-
+{%- include '/templates/commonBlocks/snmpACL.txt' %}
+!
+{%- include '/templates/commonBlocks/snmpAccessConfig.txt' %}
+!
 snmp-server location {{ snmpLocation }}
-
-{% include '/templates/commonBlocks/tacacsConfig.txt' %}
 !
-{% include '/templates/commonBlocks/motdBanner.txt' %}
+{%- include '/templates/commonBlocks/tacacsConfig.txt' %}
 !
-{% include '/templates/commonBlocks/lineConfigurations.txt' %}
+{%- include '/templates/commonBlocks/motdBanner.txt' %}
 !
-{% include '/templates/commonBlocks/ntpServers.txt' %}
+{%- include '/templates/commonBlocks/lineConfigurations.txt' %}
+!
+{%- include '/templates/commonBlocks/ntpServers.txt' %}
 end
