@@ -67,9 +67,7 @@ def build_access_templates(template_file, devices):
             switchStacks = switchStacks + 1
             floorNumber = dict_row['floorNumber']
             stackNumber = dict_row['stackNumber']
-            #print("floor number is " + floorNumber + ", stackNumber is " + stackNumber)
             orderedFloorStacks[floorNumber] = stackNumber
-            #orderedFloorStacks = collections.OrderedDict((floorStacks.items()))
             outputtext = template.render(dict_row)
 
             config_filename = CONFIGS_DIR + dict_row['siteCode'] + '-' + dict_row['floorNumber'] + '-stack' + dict_row['stackNumber'] + '-config'
@@ -95,7 +93,6 @@ def build_core_templates(template_file, devices):
         reader = csv.DictReader(f)
         for dict_row in reader:
 
-            print(orderedFloorStacks)
             dict_row['switchStacks'] = switchStacks
             dict_row['floorStacks'] = orderedFloorStacks
             outputtext = template.render(dict_row)

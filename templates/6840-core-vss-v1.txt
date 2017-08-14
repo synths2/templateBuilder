@@ -18,7 +18,6 @@ platform ip cef load-sharing ip-only
 !
 ip vrf management
 !
-
 {%- for octet in range(guestNetworkThirdOctet|int,guestNetworkThirdOctet|int + 16) %}
 ip dhcp excluded-address 172.{{ guestNetworkSecondOctet }}.{{ octet }}.0 172.{{ guestNetworkSecondOctet }}.{{ octet }}.10
 {%- endfor %}
@@ -77,12 +76,10 @@ vlan 7
 !
 vlan 8
  name {{ siteCode|lower }}-bb8-iLo
-
+!
 {%- set switch = { 'switchNumber':0 } %}
-
 {%- for floorNumber,stackNumber in floorStacks.iteritems() %}
 {%- for stack in range(1,stackNumber|int+1)  %}
-
 {%- set firstSwitchVlan = firstVlan + (switch.switchNumber * 10) %}
 {%- set stackAccessVLAN1 = firstSwitchVlan %}
 {%- set stackAccessVLAN2 = firstSwitchVlan+1 %}
@@ -92,7 +89,6 @@ vlan 8
 {%- set stackVoiceVLAN2 = firstSwitchVlan+5 %}
 {%- set stackAVVLAN = firstSwitchVlan+6 %}
 {%- set stackGuestVLAN = firstSwitchVlan+7 %}
-
 vlan {{ stackAccessVLAN1 }}
  {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-1" %}
  name  {{ vlanName }}
@@ -117,12 +113,11 @@ vlan {{ stackAVVLAN }}
 vlan {{ stackGuestVLAN }}
  {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-guest" %}
  name  {{ vlanName }}
-
 {%- set switchn = switch.switchNumber + 1 %}
 {%- if switch.update({'switchNumber':switchn }) %} {% endif %}
 {%- endfor %}
 {%- endfor %}
-
+!
 vlan 800
  name GUEST-NETWORK-1
 !
@@ -135,7 +130,7 @@ vlan 998
 vlan 999
  name Native-Trunk
 !
-{% include '/templates/commonBlocks/qosWAN.txt' %}
+{%- include '/templates/commonBlocks/qosWAN.txt' %}
 !
 ip ssh rsa keypair-name {{ coreSwitchName|upper }}.mayerbrown.com
 ip ssh version 2
@@ -164,15 +159,11 @@ interface Port-channel2
  no shutdown
 !
 {%- set switch = { 'switchNumber':0 } %}
-
 {%- for floorNumber,stackNumber in floorStacks.iteritems() %}
-
 {%- for stack in range(1,stackNumber|int+1)  %}
-
 {%- set firstSwitchVlan = firstVlan + (switch.switchNumber * 10) %}
 {%- set portchannelNumber = 3 + switch.switchNumber %}
 {%- set tenGigNumber = 1 + switch.switchNumber %}
-
 interface Port-channel {{ portchannelNumber }}
  description {{ siteCode|upper }}-{{ floorNumber|upper }}-STACK{{ stack|int }} - MONITOR
  switchport
@@ -291,518 +282,111 @@ interface Vlan8
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan300
- description par-basement-1
- ip address 10.{{ secondOctet }}.16.1 255.255.255.0
+{%- set switch = { 'switchNumber':0 } %}
+{%- set network = { 'thirdOctet':16 } %}
+{%- for floorNumber,stackNumber in floorStacks.iteritems() %}
+{%- for stack in range(1,stackNumber|int+1)  %}
+{%- set firstSwitchVlan = firstVlan + (switch.switchNumber * 10) %}
+{%- set stackAccessVLAN1 = firstSwitchVlan %}
+{%- set stackAccessVLAN2 = firstSwitchVlan+1 %}
+{%- set stackWifiVLAN = firstSwitchVlan+2 %}
+{%- set stackPrintingVLAN = firstSwitchVlan+3 %}
+{%- set stackVoiceVLAN1 = firstSwitchVlan+4 %}
+{%- set stackVoiceVLAN2 = firstSwitchVlan+5 %}
+{%- set stackAVVLAN = firstSwitchVlan+6 %}
+{%- set stackGuestVLAN = firstSwitchVlan+7 %}
+interface vlan {{ stackAccessVLAN1 }}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-1" %}
+ description {{ vlanName }}
+ ip address 10.{{ secondOctet }}.{{ network.thirdOctet }}.1 255.255.255.0
  ip helper-address 10.{{ secondOctet }}.2.50
  ip helper-address 10.{{ secondOctet }}.5.50
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan301
- description par-basement-2
- ip address 10.{{ secondOctet }}.17.1 255.255.255.0
+{%- set octetn = network.thirdOctet + 1 %}
+{%- if network.update({'thirdOctet':octetn }) %} {% endif %}
+interface vlan {{ stackAccessVLAN2 }}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-2" %}
+ description {{ vlanName }}
+ ip address 10.{{ secondOctet }}.{{ network.thirdOctet }}.1 255.255.255.0
  ip helper-address 10.{{ secondOctet }}.2.50
  ip helper-address 10.{{ secondOctet }}.5.50
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan302
- description par-basement-w
- ip address 10.{{ secondOctet }}.18.1 255.255.255.0
+{%- set octetn = network.thirdOctet + 1 %}
+{%- if network.update({'thirdOctet':octetn }) %} {% endif %}
+interface vlan {{ stackWifiVLAN }}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-w" %}
+ description {{ vlanName }}
+ ip address 10.{{ secondOctet }}.{{ network.thirdOctet }}.1 255.255.255.0
  ip helper-address 10.{{ secondOctet }}.2.50
  ip helper-address 10.{{ secondOctet }}.5.50
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan303
- description par-basement-p
- ip address 10.{{ secondOctet }}.19.1 255.255.255.0
+{%- set octetn = network.thirdOctet + 1 %}
+{%- if network.update({'thirdOctet':octetn }) %} {% endif %}
+interface vlan {{ stackPrintingVLAN }}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-p" %}
+ description {{ vlanName }}
+ ip address 10.{{ secondOctet }}.{{ network.thirdOctet }}.1 255.255.255.0
  ip helper-address 10.{{ secondOctet }}.2.50
  ip helper-address 10.{{ secondOctet }}.5.50
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan304
- description par-basement-v1
- ip address 10.{{ secondOctet }}.20.1 255.255.255.0
+{%- set octetn = network.thirdOctet + 1 %}
+{%- if network.update({'thirdOctet':octetn }) %} {% endif %}
+interface vlan {{ stackVoiceVLAN1 }}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-v1" %}
+ description {{ vlanName }}
+ ip address 10.{{ secondOctet }}.{{ network.thirdOctet }}.1 255.255.255.0
  ip helper-address 10.{{ secondOctet }}.2.50
  ip helper-address 10.{{ secondOctet }}.5.50
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan305
- description par-basement-v2
- ip address 10.{{ secondOctet }}.21.1 255.255.255.0
+{%- set octetn = network.thirdOctet + 1 %}
+{%- if network.update({'thirdOctet':octetn }) %} {% endif %}
+interface vlan {{ stackVoiceVLAN2 }}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-v2" %}
+ description {{ vlanName }}
+ ip address 10.{{ secondOctet }}.{{ network.thirdOctet }}.1 255.255.255.0
  ip helper-address 10.{{ secondOctet }}.2.50
  ip helper-address 10.{{ secondOctet }}.5.50
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan306
- description par-basement-AV
- ip address 10.{{ secondOctet }}.22.1 255.255.255.0
+{%- set octetn = network.thirdOctet + 1 %}
+{%- if network.update({'thirdOctet':octetn }) %} {% endif %}
+interface vlan {{ stackAVVLAN }}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-AV" %}
+ description {{ vlanName }}
+ ip address 10.{{ secondOctet }}.{{ network.thirdOctet }}.1 255.255.255.0
  ip helper-address 10.{{ secondOctet }}.2.50
  ip helper-address 10.{{ secondOctet }}.5.50
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan307
- description par-basement-guest
- ip address 10.{{ secondOctet }}.23.1 255.255.255.0
+{%- set octetn = network.thirdOctet + 1 %}
+{%- if network.update({'thirdOctet':octetn }) %} {% endif %}
+interface vlan {{ stackGuestVLAN }}
+ {%- set vlanName = siteCode|lower ~ "-" ~ floorNumber|lower ~ "-stack" ~ (stack|int) ~ "-guest" %}
+ description {{ vlanName }}
+ ip address 10.{{ secondOctet }}.{{ network.thirdOctet }}.1 255.255.255.0
  ip helper-address 10.{{ secondOctet }}.2.50
  ip helper-address 10.{{ secondOctet }}.5.50
  ip helper-address {{ regionalDHCPServer }}
  no ip redirects
 !
-interface vlan310
- description par-ground-1
- ip address 10.{{ secondOctet }}.24.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan311
- description par-ground-2
- ip address 10.{{ secondOctet }}.25.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan312
- description par-ground-w
- ip address 10.{{ secondOctet }}.26.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan313
- description par-ground-p
- ip address 10.{{ secondOctet }}.27.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan314
- description par-ground-v1
- ip address 10.{{ secondOctet }}.28.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan315
- description par-ground-v2
- ip address 10.{{ secondOctet }}.29.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan316
- description par-ground-AV
- ip address 10.{{ secondOctet }}.30.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan317
- description par-ground-guest
- ip address 10.{{ secondOctet }}.31.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan320
- description par-floor1-1
- ip address 10.{{ secondOctet }}.32.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan321
- description par-floor1-2
- ip address 10.{{ secondOctet }}.33.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan322
- description par-floor1-w
- ip address 10.{{ secondOctet }}.34.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan323
- description par-floor1-p
- ip address 10.{{ secondOctet }}.35.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan324
- description par-floor1-v1
- ip address 10.{{ secondOctet }}.36.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan325
- description par-floor1-v2
- ip address 10.{{ secondOctet }}.37.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan326
- description par-floor1-AV
- ip address 10.{{ secondOctet }}.38.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan327
- description par-floor1-guest
- ip address 10.{{ secondOctet }}.39.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan330
- description par-floor2-1
- ip address 10.{{ secondOctet }}.40.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan331
- description par-floor2-2
- ip address 10.{{ secondOctet }}.41.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan332
- description par-floor2-w
- ip address 10.{{ secondOctet }}.42.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan333
- description par-floor2-p
- ip address 10.{{ secondOctet }}.43.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan334
- description par-floor2-v1
- ip address 10.{{ secondOctet }}.44.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan335
- description par-floor2-v2
- ip address 10.{{ secondOctet }}.45.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan336
- description par-floor2-AV
- ip address 10.{{ secondOctet }}.46.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan337
- description par-floor2-guest
- ip address 10.{{ secondOctet }}.47.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan340
- description par-floor3-1
- ip address 10.{{ secondOctet }}.48.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan341
- description par-floor3-2
- ip address 10.{{ secondOctet }}.49.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan342
- description par-floor3-w
- ip address 10.{{ secondOctet }}.50.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan343
- description par-floor3-p
- ip address 10.{{ secondOctet }}.51.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan344
- description par-floor3-v1
- ip address 10.{{ secondOctet }}.52.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan345
- description par-floor3-v2
- ip address 10.{{ secondOctet }}.53.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan346
- description par-floor3-AV
- ip address 10.{{ secondOctet }}.54.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan347
- description par-floor3-guest
- ip address 10.{{ secondOctet }}.55.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan350
- description par-floor4-1
- ip address 10.{{ secondOctet }}.56.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan351
- description par-floor4-2
- ip address 10.{{ secondOctet }}.57.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan352
- description par-floor4-w
- ip address 10.{{ secondOctet }}.58.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan353
- description par-floor4-p
- ip address 10.{{ secondOctet }}.59.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan354
- description par-floor4-v1
- ip address 10.{{ secondOctet }}.60.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan355
- description par-floor4-v2
- ip address 10.{{ secondOctet }}.61.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan356
- description par-floor4-AV
- ip address 10.{{ secondOctet }}.62.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan357
- description par-floor4-guest
- ip address 10.{{ secondOctet }}.63.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan360
- description par-floor5-1
- ip address 10.{{ secondOctet }}.64.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan361
- description par-floor5-2
- ip address 10.{{ secondOctet }}.65.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan362
- description par-floor5-w
- ip address 10.{{ secondOctet }}.66.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan363
- description par-floor5-p
- ip address 10.{{ secondOctet }}.67.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan364
- description par-floor5-v1
- ip address 10.{{ secondOctet }}.68.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan365
- description par-floor5-v2
- ip address 10.{{ secondOctet }}.69.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan366
- description par-floor5-AV
- ip address 10.{{ secondOctet }}.70.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan367
- description par-floor5-guest
- ip address 10.{{ secondOctet }}.71.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan370
- description par-floor6-1
- ip address 10.{{ secondOctet }}.72.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan371
- description par-floor6-2
- ip address 10.{{ secondOctet }}.73.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan372
- description par-floor6-w
- ip address 10.{{ secondOctet }}.74.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan373
- description par-floor6-p
- ip address 10.{{ secondOctet }}.75.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan374
- description par-floor6-v1
- ip address 10.{{ secondOctet }}.76.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan375
- description par-floor6-v2
- ip address 10.{{ secondOctet }}.77.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan376
- description par-floor6-AV
- ip address 10.{{ secondOctet }}.78.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
-interface vlan377
- description par-floor6-guest
- ip address 10.{{ secondOctet }}.79.1 255.255.255.0
- ip helper-address 10.{{ secondOctet }}.2.50
- ip helper-address 10.{{ secondOctet }}.5.50
- ip helper-address {{ regionalDHCPServer }}
- no ip redirects
-!
+{%- set octetn = network.thirdOctet + 1 %}
+{%- if network.update({'thirdOctet':octetn }) %} {% endif %}
+{%- set switchn = switch.switchNumber + 1 %}
+{%- if switch.update({'switchNumber':switchn }) %} {% endif %}
+{%- endfor %}
+{%- endfor %}
 interface Vlan800
  description Guest Network 1
  ip address 172.{{ guestNetworkSecondOctet }}.{{ guestNetworkThirdOctet }}.1 255.255.248.0
@@ -879,14 +463,11 @@ logging host {{ syslogHost }}
 !
 {%- include '/templates/commonBlocks/tacacsConfig.txt' %}
 !
-!
-{% include '/templates/commonBlocks/lineConfigurations.txt' %}
-!
+{%- include '/templates/commonBlocks/lineConfigurations.txt' %}
 !
 {%- include '/templates/commonBlocks/ntpServers.txt' %}
 !
 diagnostic bootup level minimal
 no event manager policy Mandatory.go_switchbus.tcl type system
-!
 !
 end

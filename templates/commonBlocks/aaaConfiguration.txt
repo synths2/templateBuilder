@@ -1,16 +1,10 @@
 {# MUST include a trailing new line at the end of the file #}
 aaa new-model
 !
-!
 aaa authentication login default group tacacs+ local
 aaa authentication enable default group tacacs+ enable
 aaa authorization exec default group tacacs+ local 
 aaa authorization commands 15 default group tacacs+ local 
 aaa accounting exec default start-stop group tacacs+
-!
-!
-!
-!
-!
 !
 aaa session-id common
