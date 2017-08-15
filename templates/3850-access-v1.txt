@@ -185,7 +185,7 @@ interface TenGigabitEthernet{{ switch }}/1/3
  switchport trunk allowed vlan add 2,{{ firstVlan }}-{{ firstVlan +7 }},800,801,999
  switchport mode trunk
  channel-protocol lacp
- channel-group 1  mode active
+ channel-group {{ portchannelNumber }}  mode active
  no shutdown
 !
 {%- else %}
@@ -193,8 +193,19 @@ interface TenGigabitEthernet{{ switch }}/1/3
  shutdown
 !
 {%- endif %}
+{%- if stackMembers|int == 1 %}
+interface TenGigabitEthernet{{ switch }}/1/4
+ description {{ coreSwitchName }} - MONITOR
+ switchport trunk allowed vlan add 2,{{ firstVlan }}-{{ firstVlan +7 }},800,801,999
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group {{ portchannelNumber }}  mode active
+ no shutdown
+{%- else %}
 interface TenGigabitEthernet{{ switch }}/1/4
  shutdown 
+!
+{%- endif %}
 !
 {%- endfor %}
 !

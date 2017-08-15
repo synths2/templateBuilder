@@ -1,2 +1,2 @@
 siteCode,secondOctet,city,firstLineAddress,floorNumber,regionalDHCPServer,,guestNetworkSecondOctet,guestNetworkThirdOctet,,syslogHost,interouteCEASN,attASN
-WDC,17,Washington DC.,1999 somewhere,Basement,10.3.2.62,,29,64,,10.2.1.52,64917,65017
+PAR,73,Paris,10 Avenue Hoche,Basement,10.65.2.127,,30,96,,10.2.1.52,64973,65073

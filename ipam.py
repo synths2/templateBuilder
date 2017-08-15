@@ -5,7 +5,6 @@
 ## ---------------------------------------------------------------------------
 
 from __future__ import print_function
-import jinja2
 import csv
 import sys
 import os.path
